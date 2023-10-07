@@ -1,6 +1,5 @@
 package main
 
-//此文件用于预定义文件读取保存函数
 import (
 	"encoding/json"
 	"io/ioutil"
@@ -37,12 +36,33 @@ func saveTodosToFile(todos []TODO) error {
 	return nil
 }
 
-// 辅助函数：检查索引是否在切片中
-func containsIndex(index int, indexList []int) bool {
-	for _, i := range indexList {
-		if i == index {
-			return true
-		}
+// 函数功能:读取用户数据
+func loadUsersFromFile() ([]USER, error) {
+	data, err := ioutil.ReadFile(usersFile)
+	if err != nil {
+		return nil, err
 	}
-	return false
+
+	var users []USER
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+// 函数功能:保存用户数据
+func saveUsersToFile(users []USER) error {
+	data, err := json.Marshal(users)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(usersFile, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
