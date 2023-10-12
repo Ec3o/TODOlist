@@ -85,6 +85,7 @@ func createToken(username string) (string, error) {
 	return tokenString, nil
 }
 
+// 函数功能:获取登录状态
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
@@ -126,6 +127,7 @@ func JWTMiddleware() gin.HandlerFunc {
 	}
 }
 
+// 函数功能:添加Todo
 func TodoCreation(c *gin.Context) {
 	currentUser := currentUser
 	if currentUser == "" {
@@ -175,6 +177,7 @@ func TodoCreation(c *gin.Context) {
 	c.JSON(200, TodoSubmitSuccess)
 }
 
+// 函数功能:Todo删除
 func TodoDeletion(c *gin.Context) {
 	currentUser := currentUser
 	if currentUser == "" {
@@ -197,7 +200,7 @@ func TodoDeletion(c *gin.Context) {
 
 	// 遍历待办事项列表，找到与当前用户匹配的待办事项并匹配索引
 	for index, todo := range existingTodos {
-		if todo.Username == currentUser && index == indexToDelete {
+		if todo.Username == currentUser && todo.Index == indexToDelete {
 			// 检查是否已经在已删除的待办事项列表中
 			if todo.Content == "此Todo已被删除" {
 				c.JSON(400, TodoDeleteSuccess)
@@ -228,6 +231,7 @@ func TodoDeletion(c *gin.Context) {
 	c.JSON(404, ErrTODOIndexNotExist)
 }
 
+// 函数功能:Todo更新
 func TodoUpdate(c *gin.Context) {
 	currentUser := currentUser
 	if currentUser == "" {
@@ -235,7 +239,6 @@ func TodoUpdate(c *gin.Context) {
 		return
 	}
 	indexToUpdate, err := strconv.Atoi(c.Param("index"))
-	indexToUpdate -= 1
 	if err != nil || indexToUpdate < 0 {
 		c.JSON(404, ErrTODOIndexNotExist)
 		return
@@ -255,7 +258,7 @@ func TodoUpdate(c *gin.Context) {
 
 	// 遍历待办事项列表，找到与当前用户匹配的待办事项并匹配索引
 	for index, existingTodo := range existingTodos {
-		if existingTodo.Username == currentUser && index == indexToUpdate {
+		if existingTodo.Username == currentUser && existingTodo.Index == indexToUpdate {
 			// 更新待办事项内容
 			existingTodo.Content = todo.Content
 			existingTodo.Done = todo.Done
@@ -279,6 +282,7 @@ func TodoUpdate(c *gin.Context) {
 	c.JSON(404, ErrTODOIndexNotExist)
 }
 
+// 函数功能:列出Todo
 func ListTodos(c *gin.Context) {
 	// 从请求上下文中获取当前用户的用户名
 	currentUser := currentUser
@@ -299,7 +303,7 @@ func ListTodos(c *gin.Context) {
 	finished := c.DefaultQuery("finished", "")
 
 	// 转换 reverse 字符串为布尔值
-	reverseSort := (reverse == "true")
+	reverseSort := (reverse != "true")
 
 	// 根据 finished 参数过滤待办事项
 	filteredTodos := []TODOWithOriginalIndex{} // 使用新的结构体保存待办事项和原始索引
@@ -357,6 +361,7 @@ func ListTodos(c *gin.Context) {
 	c.JSON(200, todosWithIndex)
 }
 
+// 函数功能:查询单个Todo
 func GetTodo(c *gin.Context) {
 	currentUser := currentUser
 	if currentUser == "" {
@@ -364,7 +369,6 @@ func GetTodo(c *gin.Context) {
 		return
 	}
 	indexToGet, err := strconv.Atoi(c.Param("index"))
-	indexToGet -= 1
 	if err != nil || indexToGet < 0 {
 		c.JSON(404, ErrTODOIndexNotExist)
 		return
@@ -375,7 +379,7 @@ func GetTodo(c *gin.Context) {
 		c.JSON(500, ErrReadTODOData)
 		return
 	}
-	for index, todo := range existingTodos {
+	for _, todo := range existingTodos {
 		// 检查索引是否在 deletedTodoIndexes 中，如果在就跳过
 		if todo.Content == "此Todo已被删除" {
 			continue
@@ -386,7 +390,7 @@ func GetTodo(c *gin.Context) {
 			continue
 		}
 
-		if todo.Username == currentUser && index == indexToGet {
+		if todo.Username == currentUser && todo.Index == indexToGet {
 			filteredTodo = append(filteredTodo, todo)
 			c.JSON(200, filteredTodo)
 			return
@@ -396,6 +400,7 @@ func GetTodo(c *gin.Context) {
 	c.JSON(404, ErrTODONotFound)
 }
 
+// 函数功能:注册
 func useregister(c *gin.Context) {
 	var user USER
 	if err := c.BindJSON(&user); err != nil {
@@ -432,6 +437,7 @@ func useregister(c *gin.Context) {
 	c.JSON(200, UserRegisterSuccess)
 }
 
+// 函数功能:登录
 func userlogin(c *gin.Context) {
 	var user USER
 	if err := c.BindJSON(&user); err != nil {
