@@ -1,7 +1,6 @@
 package main
 
-//此文件用于预定义错误类型
-
+// 此文件用于预定义错误类型
 // TODOError TODO错误类型
 type TODOError struct {
 	Message string `json:"error"`
@@ -15,6 +14,22 @@ type USERError struct {
 // Successes 成功操作类型
 type Successes struct {
 	Message string `json:"status"`
+}
+type TODO struct {
+	Username string        `json:"username"`
+	Index    int           `json:"index"`
+	Content  string        `json:"content"`
+	Done     bool          `json:"done"`
+	Deadline UnixTimestamp `json:"deadline"` // 使用 int64 类型
+}
+type UnixTimestamp int64
+type USER struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+type TODOWithOriginalIndex struct {
+	Todo  TODO
+	Index int // 添加一个新的字段来保存原始索引
 }
 
 // TODOError
@@ -44,3 +59,7 @@ var (
 	UserRegisterSuccess = Successes{"用户注册成功"}
 	TodoDeleteSuccess   = Successes{"数据删除成功"}
 )
+var todosFile = "todos.json" //todo文件储存地址
+var usersFile = "users.json" //用户文件储存地址 // 使用 map 来跟踪每个用户删除的待办事项索引
+var currentUser string
+var jwtKey = []byte("Ec3o")
