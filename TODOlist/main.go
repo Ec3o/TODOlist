@@ -262,7 +262,7 @@ func ListTodos(c *gin.Context) {
 
 	for _, todo := range filteredTodos {
 		todoWithIndex := map[string]interface{}{
-			"index":    todo.Index,
+			"index":    todo.Index + 1,
 			"content":  todo.Todo.Content,
 			"done":     todo.Todo.Done,
 			"deadline": todo.Todo.Deadline, // 已经是 int64 格式
@@ -280,6 +280,7 @@ func GetTodo(c *gin.Context) {
 		return
 	}
 	indexToGet, err := strconv.Atoi(c.Param("index"))
+	indexToGet -= 1
 	if err != nil || indexToGet < 0 {
 		c.JSON(404, ErrTODOIndexNotExist)
 		return
