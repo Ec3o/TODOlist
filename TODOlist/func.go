@@ -78,7 +78,7 @@ func createToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 	})
-	tokenString, err := token.SignedString(jwtKey) // 替换成你自己的密钥
+	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", err
 	}
@@ -99,7 +99,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil // 替换成你的密钥
+			return jwtKey, nil
 		})
 
 		if err != nil {
